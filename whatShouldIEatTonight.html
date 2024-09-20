@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Should I Eat Tonight?</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #ffcccb, #ffebcd);
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #foodSuggestion {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        #foodSuggestion:hover {
+            transform: scale(1.05);
+        }
+
+        h2 {
+            margin: 15px 0;
+            font-size: 1.8em;
+        }
+
+        img {
+            width: 250px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            img {
+                width: 200px;
+            }
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>What Should I Eat Tonight?</h1>
+    <div id="foodSuggestion">
+        <h2 id="foodName"></h2>
+        <img id="foodImage" src="" alt="Food Image">
+    </div>
+    <footer>
+        <p>Powered by Appage Cravings!</p>
+    </footer>
+    <script>
+        const foods = [
+            { name: "Koththu", probability: 1, image: "images/koththu.jpg" },
+            { name: "Fried Rice", probability: 1, image: "images/fried_rice.jpg" },
+            { name: "Rice And Curry (Chicken)", probability: 50, image: "images/rice_and_curry_chicken.jpg" },
+            { name: "Rice And Curry (Fish)", probability: 40, image: "images/rice_and_curry_fish.jpg" },
+            { name: "Biriyani", probability: 3, image: "images/biriyani.jpg" },
+            { name: "Parata", probability: 2, image: "images/parata.jpg" },
+            { name: "Noodles", probability: 2, image: "images/noodles.jpg" },
+            { name: "Ramen", probability: 2, image: "images/ramen.jpg" }
+        ];
+    
+        function getRandomFood() {
+            const totalProbability = foods.reduce((sum, food) => sum + food.probability, 0);
+            const randomValue = Math.random() * totalProbability;
+            let cumulativeProbability = 0;
+    
+            for (const food of foods) {
+                cumulativeProbability += food.probability;
+                if (randomValue < cumulativeProbability) {
+                    return food;
+                }
+            }
+        }
+    
+        function displayFood(food) {
+            document.getElementById("foodName").innerText = food.name;
+            document.getElementById("foodImage").src = food.image;
+        }
+    
+        function shouldRefresh() {
+            const lastVisit = localStorage.getItem("lastVisit");
+            const now = new Date().getTime();
+            
+            // Refresh if it's been more than 24 hours
+            return !lastVisit || (now - lastVisit > 86400000);
+        }
+    
+        // Check if we need to generate a new food item
+        if (shouldRefresh()) {
+            const newFood = getRandomFood();
+            localStorage.setItem("food", JSON.stringify(newFood));
+            localStorage.setItem("lastVisit", new Date().getTime());
+        }
+    
+        // Retrieve and display the food suggestion
+        const savedFood = localStorage.getItem("food");
+        if (savedFood) {
+            const food = JSON.parse(savedFood);
+            displayFood(food);
+        } else {
+            const food = getRandomFood();
+            localStorage.setItem("food", JSON.stringify(food));
+            displayFood(food);
+        }
+    </script>    
+</body>
+</html>
